@@ -1,59 +1,67 @@
-# STACK — Crypto Portfolio & Market Terminal
+# Paw Pets
 
-A single-page, static crypto dashboard. No build step, no backend, no dependencies.
-Live market data comes straight from public, keyless APIs (CoinGecko, alternative.me)
-called from the browser at page load.
-
-## What's in this repo
+Static marketing site for Paw Pets. Plain HTML/CSS, no build step required.
 
 ```
-.
-├── index.html      # the entire app (HTML + CSS + JS, self-contained)
-├── vercel.json     # zero-config static deployment settings
-└── README.md
+paw-pets-app/
+├── index.html              ← the site (served from repo root)
+├── vercel.json             ← deploy config
+├── package.json
+├── .github/
+│   └── workflows/
+│       └── deploy.yml      ← CI workflow that deploys to Vercel on push
+└── .gitignore
 ```
 
-## Deploy — GitHub → Vercel (recommended)
+This is a zero-build static site — `index.html` sits at the project root, so Vercel serves it directly with no output-directory configuration needed.
 
-1. **Create a new GitHub repo**
-   - Go to [github.com/new](https://github.com/new), name it (e.g. `stack-dashboard`), keep it public or private, don't initialize with a README (you already have one).
-
-2. **Push this folder to it**
-   ```bash
-   cd stack-dashboard
-   git init
-   git add .
-   git commit -m "Initial commit — STACK dashboard"
-   git branch -M main
-   git remote add origin https://github.com/<your-username>/<your-repo>.git
-   git push -u origin main
-   ```
-
-3. **Import into Vercel**
-   - Go to [vercel.com/new](https://vercel.com/new)
-   - Select "Import Git Repository" and pick the repo you just pushed
-   - Framework preset: choose **Other** (it's static HTML — no build command, no output directory needed)
-   - Click **Deploy**
-
-   Vercel will give you a live URL (e.g. `stack-dashboard.vercel.app`) within seconds.
-
-4. **Every future push to `main` auto-deploys** — no extra config needed.
-
-## Deploy — Vercel CLI (alternative, no GitHub needed)
+## 1. Push this to GitHub
 
 ```bash
-npm i -g vercel
-cd stack-dashboard
-vercel          # follow prompts, deploys a preview
-vercel --prod   # promotes to your production URL
+git init
+git add .
+git commit -m "Initial commit: Paw Pets site"
+git branch -M main
+git remote add origin https://github.com/<your-username>/<your-repo>.git
+git push -u origin main
 ```
 
-## Notes
+## 2. Connect to Vercel
 
-- All data fetches (CoinGecko prices, alternative.me Fear & Greed Index) happen
-  client-side in the visitor's browser — nothing to configure, no API keys, no
-  environment variables required.
-- If CoinGecko or alternative.me are unreachable or rate-limit the visitor, the
-  dashboard falls back to a "data unavailable" state rather than showing stale
-  or fake numbers.
-- Not financial advice — this is a personal portfolio/news dashboard template.
+You have two ways to deploy — pick one. Don't set up both, they'll conflict.
+
+### Option A — Vercel's native Git integration (simplest, recommended)
+
+1. Go to [vercel.com/new](https://vercel.com/new) and import the GitHub repo.
+2. Framework preset: choose **Other**. Leave Build Command and Output Directory blank/default — there's nothing to build, `index.html` is served straight from the repo root.
+3. Deploy. Vercel will now auto-deploy every push to `main` (and generate preview URLs for PRs) on its own — **you can delete `.github/workflows/deploy.yml`** in this case, since Vercel is already watching the repo directly.
+
+### Option B — GitHub Actions workflow (this repo's `deploy.yml`)
+
+Use this if you want deploys to run through GitHub Actions instead of Vercel's own Git integration (e.g. for custom CI steps, gating, or org policy reasons).
+
+1. In Vercel, run this once locally to link the project and generate IDs:
+   ```bash
+   npm i -g vercel
+   vercel link
+   ```
+   This creates a `.vercel/project.json` with your `orgId` and `projectId`.
+
+2. Get a Vercel access token: [vercel.com/account/tokens](https://vercel.com/account/tokens).
+
+3. In your GitHub repo, go to **Settings → Secrets and variables → Actions** and add:
+   - `VERCEL_TOKEN` — the token from step 2
+   - `VERCEL_ORG_ID` — from `.vercel/project.json`
+   - `VERCEL_PROJECT_ID` — from `.vercel/project.json`
+
+4. **In the Vercel dashboard, turn off "Auto Deploy" from Git** for this project (Project Settings → Git), so Vercel doesn't double-deploy alongside the Action.
+
+5. Push to `main` — the workflow in `.github/workflows/deploy.yml` will build and deploy automatically. Pull requests get preview deployments; pushes to `main` go to production.
+
+## Local preview
+
+```bash
+npm run dev
+```
+
+Serves the project root at `http://localhost:3000`.

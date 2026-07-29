@@ -1,0 +1,10 @@
+{
+  "name": "paw-pets",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Paw Pets — static marketing site",
+  "scripts": {
+    "build": "echo \"Static site — nothing to build\"",
+    "dev": "npx serve ."
+  }
+}
